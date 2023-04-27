@@ -31,7 +31,7 @@ Technos utilisés : nodeJS
 Les informations relatives à l'utilisation du chat et à la navigation dans le forum de discussion sont indiquées lorsque vous lancez une instance du chat.
 
 ### Fonctionnalités mise en place :
-- login avec username
+- login avec username (pas de user unique mis en place)
 - chat général
 - Possibilité de créer un canal de discussion avec un nom
 - Inviter des utilisateurs dans le canal de discussion où l'on se trouve
