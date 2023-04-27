@@ -77,15 +77,22 @@ client.on('connect', () => {
 
 // Gestion de la réception de messages
 client.on('message', (topic, message) => {
-    console.log(`──────────────────────────────\nCanal: ${topic} | ${message.toString()}`);
+    if(currentChannel.startsWith('one-to-one/')){
+        if(message.toString().split(' ')[2] === topic.split('/')[1] || topic.split('/')[1] === username ){
+            console.log(`──────────────────────────────\nCanal: ${topic} | ${message.toString()}`);
+        }
+    }else{
+        console.log(`──────────────────────────────\nCanal: ${topic} | ${message.toString()}`);
+    }
+
     try {
         lastMessageUser = message.toString().split(' ')[1];
         if(lastMessageUser.includes("Private")) lastMessageUser = message.toString().split(' ')[2];
     }catch (e){
     }
+
     if(message.includes('INVITATION')){
         invite = message.toString().split(' ')[8];
-        console.log(invite);
     }
 });
 
@@ -114,20 +121,19 @@ rl.on('line', (input) => {
             }
         });
     }else if(input === ':accept'){
-        if(invite !== false){
+        if(invite === false || invite === currentChannel){
+            console.log("vous n'avez pas été invité à rejoindre un canal ou vous êtes déjà dans le canal dans lequel on vous a invité");
+        }else{
             client.unsubscribe(currentChannel);
             currentChannel = invite;
             invite = false;
             joinChannel(currentChannel);
-        }else{
-            console.log("vous n'avez pas été invité à rejoindre un canal ou vous êtes déjà dans le canal dans lequel on vous a invité");
         }
     } else if(input === ':private'){
         if(lastMessageUser === username){
             console.log("vous ne pouvez pas discuter avec vous même");
         }else if(lastMessageUser !== false) {
             client.unsubscribe(currentChannel);
-            console.log(lastMessageUser);
             joinChannel(`one-to-one/${lastMessageUser}`);
             console.log(`vous communiquez maintenant directement avec ${lastMessageUser}`);
         }else{
@@ -138,6 +144,8 @@ rl.on('line', (input) => {
     }else if (currentChannel) {
         if (currentChannel.startsWith('one-to-one/')) {
             client.publish(currentChannel, `Expéditeur: [Private] ${username} \nMessage:  ${input}\n──────────────────────────────`);
+            console.log(`──────────────────────────────\nMon Message:  ${input}\n──────────────────────────────\n`);
+
         } else {
             client.publish(currentChannel, `Expéditeur: ${username} \nMessage: ${input}\n──────────────────────────────`);
         }
